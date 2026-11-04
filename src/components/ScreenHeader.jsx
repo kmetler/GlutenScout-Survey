@@ -1,5 +1,6 @@
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import Icon from './Icon.jsx'
+import { historyIndex, pathAt } from './backStack.js'
 
 // Header / back pattern for every screen below a tab root.
 // `backTo` gives a fixed destination (use it in step-by-step flows).
@@ -8,10 +9,15 @@ import Icon from './Icon.jsx'
 // With neither, Back returns to the previous screen.
 export default function ScreenHeader({ title, back = true, backTo, fallbackTo, action }) {
   const navigate = useNavigate()
-  const location = useLocation()
   const goBack = () => {
-    if (backTo) navigate(backTo)
-    else if (fallbackTo && location.key === 'default') navigate(fallbackTo)
+    const idx = historyIndex()
+    const previous = idx > 0 ? pathAt(idx - 1) : undefined
+    if (backTo) {
+      // Step back for real when the destination is the screen we came from; otherwise swap this
+      // entry for the destination. Never push — pushing made Back bounce between two screens.
+      if (previous === backTo.split('?')[0]) navigate(-1)
+      else navigate(backTo, { replace: true })
+    } else if (idx === 0) navigate(fallbackTo ?? '/', { replace: true })
     else navigate(-1)
   }
   return (

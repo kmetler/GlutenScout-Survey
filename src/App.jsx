@@ -11,6 +11,7 @@ import AccountRoutes from './screens/account/index.jsx'
 import MyMeals from './screens/account/MyMeals.jsx'
 import { SECTIONS } from './screens/sections.js'
 import { readStored, writeStored } from './data/storage.js'
+import { useTrackBackStack } from './components/backStack.js'
 
 const DISCLOSURE_KEY = 'gs-disclosure-seen'
 const THEME_KEY = 'gs-theme'
@@ -27,6 +28,7 @@ export default function App() {
   const [showDisclosure, setShowDisclosure] = useState(() => !readStored(DISCLOSURE_KEY))
   const screenRef = useRef(null)
   const { pathname } = useLocation()
+  useTrackBackStack()
 
   // Each screen starts at the top.
   useEffect(() => {
